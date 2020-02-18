@@ -5,6 +5,7 @@ package storecache
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"sync"
 
@@ -177,6 +178,7 @@ func NewInMemoryIndexCacheWithConfig(logger log.Logger, reg prometheus.Registere
 }
 
 func (c *InMemoryIndexCache) onEvict(key, val interface{}) {
+	fmt.Println("evicting!")
 	k := key.(cacheKey).keyType()
 	entrySize := sliceHeaderSize + uint64(len(val.([]byte)))
 
@@ -228,6 +230,8 @@ func (c *InMemoryIndexCache) set(typ string, key cacheKey, val []byte) {
 	c.totalCurrentSize.WithLabelValues(typ).Add(float64(size + key.size()))
 	c.current.WithLabelValues(typ).Inc()
 	c.curSize += size
+
+	fmt.Println("Current size:", typ, key, c.curSize)
 }
 
 // ensureFits tries to make sure that the passed slice will fit into the LRU cache.
